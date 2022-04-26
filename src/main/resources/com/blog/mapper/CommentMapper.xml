@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.blog.mapper.CommentMapper">
+
+    <insert id="saveComment" keyProperty="id" useGeneratedKeys="true">
+        insert into comment(id, nickname, email, content, avatar, create_time, parent_comment_id, blog_id,
+                            admin_comment)
+        values (null, #{nickname}, #{email}, #{content}, #{avatar}, #{create_time}, null, #{blogId}, #{adminComment});
+    </insert>
+    <insert id="saveCommentParent">
+        insert into comment(id, nickname, email, content, avatar, create_time, parent_comment_id, blog_id,
+                            admin_comment)
+        values (null, #{nickname}, #{email}, #{content}, #{avatar}, #{create_time}, #{parentCommentId},
+                #{blogId}, #{adminComment});
+    </insert>
+    <!--根据博客id删除评论-->
+    <delete id="deleteById">
+        delete
+        from comment
+        where blog_id = #{id};
+    </delete>
+
+
+    <resultMap id="comments" type="comment">
+        <id property="id" column="cid"/>
+        <result property="nickname" column="nickname"/>
+        <result property="avatar" column="avatar"/>
+        <result property="create_time" column="create_time"/>
+        <result property="content" column="content"/>
+        <result property="email" column="email"/>
+        <result property="blogId" column="blog_id"/>
+        <result property="adminComment" column="admin_comment"/>
+        <result property="parentCommentId" column="parent_comment_id"/>
+        <association property="parentComment" javaType="comment" column="parent_comment_id" select="getParent"/>
+        <association property="blog" javaType="blog">
+            <id property="id" column="bid"/>
+        </association>
+        <collection property="replyComments" ofType="comment" select="selectChildren"
+                    column="{id=cid,blog_id=blog_id}"/>
+    </resultMap>
+    <select id="getParent" resultType="comment">
+        select *
+        from comment
+        where id = #{parent_comment_id}
+    </select>
+
+    <select id="listCommentByBlogId" resultMap="comments">
+        select c.id cid,
+               c.nickname,
+               c.email,
+               c.content,
+               c.avatar,
+               c.create_time,
+               c.parent_comment_id,
+               c.blog_id,
+               c.admin_comment,
+               b.id bid
+        from comment as c
+                 left join blog b on b.id = c.blog_id
+        where c.blog_id = #{blogId}
+          and c.parent_comment_id is null
+        order by create_time asc;
+    </select>
+    <select id="selectChildren" resultMap="comments">
+        select c.id cid,
+               c.nickname,
+               c.email,
+               c.content,
+               c.avatar,
+               c.create_time,
+               c.parent_comment_id,
+               c.blog_id,
+               c.admin_comment,
+               b.id bid
+        from comment c
+                 left join blog b on b.id = c.blog_id
+        where c.blog_id = #{blog_id}
+          and parent_comment_id = #{id};
+    </select>
+
+
+    <select id="findOne" resultType="com.blog.pojo.Comment">
+        select id,
+               nickname,
+               email,
+               content,
+               avatar,
+               create_time,
+               admin_comment,
+               parent_comment_id,
+               blog_id
+        from comment
+        where id = #{parentCommentId}
+    </select>
+</mapper>

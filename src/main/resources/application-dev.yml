@@ -1,0 +1,22 @@
+spring:
+  #datasource
+  datasource:
+    url: jdbc:mysql://localhost:3306/blog?useSSL=false&useAffectedRows=true&&allowMultiQueries=true
+    username: root
+    password: 159357
+    driver-class-name: com.mysql.cj.jdbc.Driver
+#mybatis
+mybatis:
+  mapper-locations: classpath:com/blog/mapper/*Mapper.xml #mapper的映射文件路径
+  config-location: classpath:mybatis-config.xml
+#  type-aliases-package: com.blog.domain
+# config-location: 指定mybatis的核心配置文件
+
+#配置日志
+logging:
+  level:
+    root: info
+    com.blog: debug
+  file:
+    name: log\blog-dev.log
+

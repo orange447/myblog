@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.blog.mapper.TypeMapper">
+
+    <!--新增-->
+    <insert id="save" useGeneratedKeys="true" keyProperty="id">
+        insert into type(id, name)
+        values (null, #{name});
+    </insert>
+    <!--更新-->
+    <update id="UpdateType">
+        update type
+        set name = #{type.name}
+        where id = #{i};
+    </update>
+    <!--根据id查询-->
+    <select id="getOneType" resultType="type">
+        select id, name
+        from type
+        where id = #{id};
+    </select>
+    <select id="findAllTypeDesc" resultType="type">
+        select id, name
+        from type
+        order by id desc
+    </select>
+    <!--根据id删除-->
+    <delete id="deleteOne">
+        delete
+        from type
+        where id = #{id}
+    </delete>
+    <!--根据分类名查询-->
+    <select id="getByName" resultType="type">
+        select id, name
+        from type
+        where name = #{name}
+    </select>
+    <select id="findTop" resultMap="typeBlog">
+        select t.id, t.name, count(b.type_id) as totalblog
+        from type as t,
+             blog as b
+        where t.id = b.type_id and b.published = 1
+        group by t.id
+        order by count(b.type_id) desc
+        limit 0,#{size};
+    </select>
+    <resultMap id="typeBlog" type="com.blog.pojo.vo.TypeBlogVo">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="totalBlog" column="totalblog"/>
+    </resultMap>
+
+</mapper>

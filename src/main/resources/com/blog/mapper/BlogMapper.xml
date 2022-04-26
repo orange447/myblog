@@ -1,0 +1,398 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.blog.mapper.BlogMapper">
+    <!-- <sql id="blog_column">
+         id, title, content, views, appreciation, share_statement, commentabled, published,
+                          create_time, update_time, first_picture, flag, comment_count, type_id, user_id
+     </sql>-->
+
+    <!--新增-->
+    <insert id="saveBlog" keyProperty="id" useGeneratedKeys="true">
+        insert into blog
+        values (null, #{title}, #{content}, #{views}, #{appreciation}, #{shareStatement}, #{commentabled}, #{published},
+                #{createTime}, #{updateTime}, #{firstPicture}, #{flag}, #{commentCount}, #{typeId},
+                #{userId}, #{description})
+    </insert>
+    <!--更新-->
+    <update id="updateBlog">
+        update blog
+        <set>
+            <if test="title!='' and title != null ">
+                title = #{title},
+            </if>
+            <if test="content!='' and content != null ">
+                content = #{content},
+            </if>
+            <if test="views != null ">
+                views = #{views},
+            </if>
+            <if test="appreciation">
+                appreciation=1,
+            </if>
+            <if test="!appreciation">
+                appreciation=0,
+            </if>
+            <if test="shareStatement">
+                share_statement =1,
+            </if>
+            <if test="!shareStatement">
+                share_statement =0,
+            </if>
+            <if test="commentabled">
+                commentabled=1,
+            </if>
+            <if test="!commentabled">
+                commentabled=0,
+            </if>
+            <if test="published">
+                published = 1,
+            </if>
+            <if test="!published">
+                published = 0,
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime},
+            </if>
+            <if test="firstPicture != null and firstPicture!= ''">
+                first_picture = #{firstPicture},
+            </if>
+            <if test="flag != null and flag != ''">
+                flag = #{flag},
+            </if>
+            <if test="typeId != null">
+                type_id = #{typeId},
+            </if>
+            <if test="userId != null">
+                user_id = #{userId},
+            </if>
+            <if test="description != null and description != ''">
+                description = #{description}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+    <!--更新浏览次数-->
+    <update id="updateViews">
+        update blog b
+        set b.views = b.views + 1
+        where b.id = #{id}
+    </update>
+    <!--删除-->
+    <delete id="deleteBlog">
+        delete
+        from blog
+        where id = #{id}
+    </delete>
+
+    <!--根据id查询-->
+    <select id="getBlog" resultMap="blog_all">
+        select b.id    bid,
+               b.title,
+               b.content,
+               b.views,
+               b.appreciation,
+               b.share_statement,
+               b.commentabled,
+               b.published,
+               b.create_time,
+               b.update_time,
+               b.first_picture,
+               b.flag,
+               b.type_id,
+               b.user_id,
+               b.description,
+               t.name  tname,
+               t.id    tid,
+               ty.id   tyid,
+               ty.name tyname
+        from blog as b
+                 left join blog_tag bt on b.id = bt.blog_id
+                 left join tag t on t.id = bt.tag_id
+                 left join type ty on b.type_id = ty.id
+        where b.id = #{id};
+    </select>
+
+    <resultMap id="blog_all" type="Blog">
+        <id property="id" column="bid"/>
+        <result property="title" column="title"/>
+        <result property="content" column="content"/>
+        <result property="views" column="views"/>
+        <result property="appreciation" column="appreciation"/>
+        <result property="shareStatement" column="share_statement"/>
+        <result property="commentabled" column="commentabled"/>
+        <result property="published" column="published"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="firstPicture" column="first_picture"/>
+        <result property="flag" column="flag"/>
+        <result property="userId" column="user_id"/>
+        <result property="description" column="description"/>
+        <association property="type" javaType="type">
+            <id property="id" column="tyid"/>
+            <result property="name" column="tyname"/>
+        </association>
+        <collection property="tagList" ofType="tag">
+            <id column="tid" property="id"/>
+            <result property="name" column="tname"/>
+        </collection>
+
+    </resultMap>
+    <!--按条件查询-->
+    <select id="splitPage" resultMap="blog_type">
+        <bind name="pattern" value="'%'+title+ '%'"/>
+        select b.id bid, b.title,b.update_time,b.published,b.description,b.type_id,t.id tid,t.name tname
+        from blog b,type t
+        <where>
+            <if test="1 == 1">
+                b.type_id = t.id
+            </if>
+            <if test="typeId != null">
+                and b.type_id = #{typeId}
+            </if>
+            <if test="title != null">
+                and b.title like #{pattern}
+            </if>
+        </where>
+        order by update_time desc
+    </select>
+    <!--查询全部-->
+    <resultMap id="blog_type" type="Blog">
+        <id property="id" column="bid"/>
+        <result property="title" column="title"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="published" column="published"/>
+        <result property="description" column="description"/>
+        <association property="type" javaType="type">
+            <id column="tid" property="id"/>
+            <result property="name" column="tname"/>
+        </association>
+    </resultMap>
+    <select id="findAllDesc" resultMap="blog_type">
+        select b.id bid, b.title, b.update_time, b.published, b.type_id, t.id tid, t.name tname
+        from blog b
+                 left join type t on b.type_id = t.id
+        order by b.update_time desc
+    </select>
+    <select id="listBlogTop" resultMap="blog_all_info">
+        select b.id    bid,
+               b.title,
+               b.content,
+               b.views,
+               b.appreciation,
+               b.share_statement,
+               b.commentabled,
+               b.published,
+               b.create_time,
+               b.update_time,
+               b.first_picture,
+               b.flag,
+               b.type_id,
+               b.user_id,
+               b.description,
+               t.name  tname,
+               t.id    tid,
+               ty.id   tyid,
+               ty.name tyname,
+               u.id    uid,
+               u.nickname,
+               u.avatar
+        from blog as b
+                 left join blog_tag bt on b.id = bt.blog_id
+                 left join tag t on t.id = bt.tag_id
+                 left join type ty on b.type_id = ty.id
+                 left join user u on b.user_id = u.id
+        where b.published = 1
+        group by b.update_time desc
+        limit 0,#{size};
+    </select>
+    <select id="findAll" resultMap="blog_all_info">
+        select b.id    bid,
+               b.title,
+               b.content,
+               b.views,
+               b.appreciation,
+               b.share_statement,
+               b.commentabled,
+               b.published,
+               b.create_time,
+               b.update_time,
+               b.first_picture,
+               b.flag,
+               b.type_id,
+               b.user_id,
+               b.description,
+               t.name  tname,
+               t.id    tid,
+               ty.id   tyid,
+               ty.name tyname,
+               u.id    uid,
+               u.nickname,
+               u.avatar
+        from blog as b
+                 left join blog_tag bt on b.id = bt.blog_id
+                 left join tag t on t.id = bt.tag_id
+                 left join type ty on b.type_id = ty.id
+                 left join user u on b.user_id = u.id
+        where b.published = 1
+        group by b.update_time desc
+    </select>
+    <!--客户端根据搜索框查询-->
+    <select id="blogQuery" resultMap="blog_all_info">
+        <bind name="search" value="'%'+query+ '%'"/>
+        select b.id bid,
+        b.title,
+        b.content,
+        b.views,
+        b.appreciation,
+        b.share_statement,
+        b.commentabled,
+        b.published,
+        b.create_time,
+        b.update_time,
+        b.first_picture,
+        b.flag,
+        b.type_id,
+        b.user_id,
+        b.description,
+        t.name tname,
+        t.id tid,
+        ty.id tyid,
+        ty.name tyname,
+        u.id uid,
+        u.nickname,
+        u.avatar
+        from blog as b
+        left join blog_tag bt on b.id = bt.blog_id
+        left join tag t on t.id = bt.tag_id
+        left join type ty on b.type_id = ty.id
+        left join user u on b.user_id = u.id
+        where b.title like #{search} or b.content like #{search}
+        group by b.update_time desc
+    </select>
+    <select id="blogTypeId" resultMap="blog_all_info">
+        select b.id    bid,
+               b.title,
+               b.content,
+               b.views,
+               b.appreciation,
+               b.share_statement,
+               b.commentabled,
+               b.published,
+               b.create_time,
+               b.update_time,
+               b.first_picture,
+               b.flag,
+               b.type_id,
+               b.user_id,
+               b.description,
+               t.name  tname,
+               t.id    tid,
+               ty.id   tyid,
+               ty.name tyname,
+               u.id    uid,
+               u.nickname,
+               u.avatar
+        from blog as b
+                 left join blog_tag bt on b.id = bt.blog_id
+                 left join tag t on t.id = bt.tag_id
+                 left join type ty on b.type_id = ty.id
+                 left join user u on b.user_id = u.id
+        where ty.id = #{id} and b.published = 1
+        group by b.update_time desc
+    </select>
+    <select id="blogTagId" resultMap="blog_all_info">
+        select b.id    bid,
+               b.title,
+               b.content,
+               b.views,
+               b.appreciation,
+               b.share_statement,
+               b.commentabled,
+               b.published,
+               b.create_time,
+               b.update_time,
+               b.first_picture,
+               b.flag,
+               b.type_id,
+               b.user_id,
+               b.description,
+               t.name  tname,
+               t.id    tid,
+               ty.id   tyid,
+               ty.name tyname,
+               u.id    uid,
+               u.nickname,
+               u.avatar
+        from blog as b
+                 left join blog_tag bt on b.id = bt.blog_id
+                 left join type ty on b.type_id = ty.id
+                 left join user u on b.user_id = u.id
+                 left join tag t on t.id = bt.tag_id
+        where t.id = #{id} and b.published = 1
+        group by b.update_time desc
+    </select>
+    <select id="getById" resultMap="blog_all_info">
+        select b.id    bid,
+               b.title,
+               b.content,
+               b.views,
+               b.appreciation,
+               b.share_statement,
+               b.commentabled,
+               b.published,
+               b.create_time,
+               b.update_time,
+               b.first_picture,
+               b.flag,
+               b.type_id,
+               b.user_id,
+               b.description,
+               t.name  tname,
+               t.id    tid,
+               ty.id   tyid,
+               ty.name tyname,
+               u.id    uid,
+               u.nickname,
+               u.avatar
+        from blog as b
+                 left join blog_tag bt on b.id = bt.blog_id
+                 left join tag t on t.id = bt.tag_id
+                 left join type ty on b.type_id = ty.id
+                 left join user u on b.user_id = u.id
+        where b.id = #{id}
+    </select>
+
+    <resultMap id="blog_all_info" type="Blog">
+        <id property="id" column="bid"/>
+        <result property="title" column="title"/>
+        <result property="content" column="content"/>
+        <result property="views" column="views"/>
+        <result property="appreciation" column="appreciation"/>
+        <result property="shareStatement" column="share_statement"/>
+        <result property="commentabled" column="commentabled"/>
+        <result property="published" column="published"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="firstPicture" column="first_picture"/>
+        <result property="flag" column="flag"/>
+        <result property="userId" column="user_id"/>
+        <result property="description" column="description"/>
+        <result property="typeId" column="type_id"/>
+        <association property="type" javaType="type">
+            <id property="id" column="tyid"/>
+            <result property="name" column="tyname"/>
+        </association>
+        <association property="user" javaType="user">
+            <id property="id" column="uid"/>
+            <result property="nickname" column="nickname"/>
+            <result property="avatar" column="avatar"/>
+        </association>
+        <collection property="tagList" ofType="tag" javaType="ArrayList">
+            <id column="tid" property="id"/>
+            <result property="name" column="tname"/>
+        </collection>
+
+    </resultMap>
+</mapper>

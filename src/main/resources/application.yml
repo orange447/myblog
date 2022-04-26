@@ -1,0 +1,8 @@
+spring:
+  thymeleaf:
+    mode: HTML5
+  profiles:
+    active: dev
+
+comment:
+  avatar: /images/i.jpg

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="admin/_fragments ::  head(~{::title})">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>博客管理</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
+    <link rel="stylesheet" href="../../static/css/indexcss.css">
+    <!--<link rel="stylesheet" href="css/bloginfo.css">-->
+</head>
+<body>
+<!--导航-->
+<nav th:replace="admin/_fragments :: menu(0)" class="ui inverted attached segment m-padded-tb-min m-shadow-small">
+    <div class="ui container">
+        <div class="ui secondary menu  stackable inverted " id="top">
+            <h1 class="ui header teal  m-padded-lr m-margin-top-bottom">管理后台</h1>
+            <a href="#" class="m-item item m-mobile-hide"><i class="home icon"></i>博客</a>
+            <a href="#" class="m-item item m-mobile-hide"><i class="idea icon"></i>分类</a>
+            <a href="#" class="m-item item m-mobile-hide"><i class="tags icon"></i>标签</a>
+            <div class="right m-item m-mobile-hide menu">
+                <div class="item ui dropdown">
+                    <div class="text">
+                        <img class="ui avatar image" src="http://m.imeitou.com/uploads/allimg/220329/5-220329102950.jpg">
+                        Galaxy
+                    </div>
+                    <i class="dropdown icon"></i>
+                    <div class="menu">
+                        <a href="#" class="item">注销</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <a href="#" class="ui menu toggle icon black button m-right-top  m-mobile-show">
+        <i class="sidebar icon"></i>
+    </a>
+</nav>
+
+<!--中间内容-->
+<div class="m-padded-tb-big m-container">
+
+    <div class="m-container-small .m-padded-tb">
+        <div class="ui container">
+            <div class="ui success large message">
+                <h2>Hi,</h2>
+                <p>Yin,欢迎登录</p>
+            </div>
+            <img src="" class="ui image rounded" alt="加载失败" style="width: 840px" th:src="@{/images/test.png}">
+        </div>
+    </div>
+</div>
+
+
+<!--底部-->
+<footer th:replace="admin/_fragments :: footer" class="ui inverted vertical segment  m-padded-tb-massive">
+    <div class="ui center aligned container">
+        <div class="ui grid stackable inverted divided">
+            <div class="three wide column ">
+                <img src="http://m.imeitou.com/uploads/allimg/220329/5-220329102950.jpg" class="ui round image centered" style="width: 110px;">
+            </div>
+            <div class="three wide column">
+                <h4 class="ui inverted header m-text-thin m-text-spaced m-text-lined">最新博客</h4>
+                <div class="ui inverted link list">
+                    <a href="" class="item">用户故事（User Story）</a>
+                    <a href="" class="item">用户故事（User Story）</a>
+                    <a href="" class="item">用户故事（User Story）</a>
+                </div>
+            </div>
+            <div class="three wide column">
+                <h4 class="ui inverted header m-text-thin m-text-spaced m-text-lined">联系我</h4>
+                <div class="ui inverted link list">
+                    <a href="" class="item">Email:17390225725@163.com</a>
+                    <a href="" class="item">QQ:2297939266</a>
+                </div>
+            </div>
+            <div class="seven wide column">
+                <h4 class="ui inverted header m-text-thin m-text-spaced m-text-lined">Blog</h4>
+                <p class="m-text-thin m-text-spaced m-opacity-mini m-text-lined">
+                    这是我的个人博客，会分享关于编程、写作、思考相关的任何内容，希望可以对来到这儿的人有所帮助...
+                </p>
+            </div>
+        </div>
+        <div class="ui inverted section divider"></div>
+        <p class="m-text-thin m-text-spaced m-opacity-tiny m-text-lined">Copyright © 2022-2023 Designed Blog</p>
+    </div>
+</footer>
+<!--/*/<th:block th:replace="admin/_fragments :: script">/*/-->
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.2.4/dist/semantic.min.js"></script>
+<!--/*/</th:block>/*/-->
+<script>
+    $('.menu.toggle').on('click', function () {
+        $('.m-item').toggleClass('m-mobile-hide')
+    });
+    $('.ui.dropdown').dropdown({
+        on: 'hover'
+    });
+
+</script>
+
+</body>
+</html>

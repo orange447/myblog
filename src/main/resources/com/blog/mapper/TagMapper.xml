@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.blog.mapper.TagMapper">
+
+    <!--新增-->
+    <insert id="save" useGeneratedKeys="true" keyProperty="id">
+        insert into tag(id, name)
+        values (null, #{name});
+    </insert>
+    <!--更新-->
+    <update id="UpdateTag">
+        update tag
+        set name = #{tag.name}
+        where id = #{i};
+    </update>
+    <!--根据id查询-->
+    <select id="getOneTag" resultType="tag">
+        select id, name
+        from tag
+        where id = #{id};
+    </select>
+    <select id="findAllTagDesc" resultType="tag">
+        select id, name
+        from tag
+        order by id desc
+    </select>
+    <!--根据id删除-->
+    <delete id="deleteOne">
+        delete
+        from tag
+        where id = #{id}
+    </delete>
+    <!--根据分类名查询-->
+    <select id="getByName" resultType="tag">
+        select id, name
+        from tag
+        where name = #{name}
+    </select>
+    <select id="getByIds" resultType="com.blog.pojo.Tag">
+        select id,name from tag
+        <where>
+            id in
+            <foreach collection="array" open="(" close=")" separator="," item="id">
+                #{id}
+            </foreach>
+        </where>
+    </select>
+    <select id="findTop" resultMap="tagBlog">
+        select t.id, t.name, count(b.type_id) as totalblog
+        from tag as t,
+             blog as b,
+             blog_tag as bg
+        where t.id = bg.tag_id
+          and b.id = bg.blog_id
+        and b.published = 1
+        group by t.id
+        order by count(b.type_id) desc
+        limit 0,#{size};
+    </select>
+    <resultMap id="tagBlog" type="com.blog.pojo.vo.TagBlogVo">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="totalBlog" column="totalblog"/>
+    </resultMap>
+</mapper>
