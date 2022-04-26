@@ -1,2 +1,2 @@
 # myblog
-基于SpringBoot 、Semantic UI、Mybatis以及Thymeleaf实现
+基于SpringBoot 、Semantic UI、Mybatis以及Thymeleaf实现的个人博客网站。主要功能是实现了管理员对博客的管理：对博客、博客分类、博客标签的CRUD。针对前端访客实现了对博客的浏览，根据分类查询博客、根据标签查询博客以及根据关键字对博客进行检索。此外，增加了访客对博客的评论功能。
